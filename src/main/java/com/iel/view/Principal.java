@@ -309,13 +309,19 @@ public class Principal extends javax.swing.JFrame {
                 } else {
                     jogador = lblJogador2.getText();
                 }
-                JOptionPane.showMessageDialog(this, "Parabéns, o jogador " + jogador + " venceu o jogo", "VENCEDOR", JOptionPane.OK_OPTION);
+                JOptionPane.showMessageDialog(this, "Parabéns, o jogador " + jogador + " venceu o jogo", "VENCEDOR", JOptionPane.INFORMATION_MESSAGE);
             }
             qmJoga = !qmJoga;
+        }
+        if(verificaVelha()){
+            JOptionPane.showMessageDialog(this, "Putz, deu velha, vamos jogar de novo", "VELHA", JOptionPane.WARNING_MESSAGE);
         }
     }
     
     public boolean verificaVelha(){
+        for(String v : arrayJogo)
+            if(v != "X" && v != "O")
+                return false;
         return true;
     }
 
