@@ -6,8 +6,15 @@
 package com.iel.view;
 
 import java.util.Random;
-import javax.swing.JButton;
-import javax.swing.JOptionPane;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import javax.swing.*;
 
 /**
  *
@@ -15,38 +22,67 @@ import javax.swing.JOptionPane;
  */
 public class Principal extends javax.swing.JFrame {
 
-    public boolean qmJoga = true;
-    public String[] arrayJogo = new String[9];
+    public final int QTD_NOME_MAQUINA = 16;
+
     public int tamTab = 3;
-    public String[] nomes = new String[12];
+    public String[] nomes = new String[QTD_NOME_MAQUINA];
+    public boolean qmJoga;
+    public String[] arrayJogo;
+    public JButton[] listaBotao;
+    public boolean contraPC = false;
+    public String pecaPC = "O";
+    public boolean primeiroJogo = true;
 
     public Principal() {
-        nomes[0] = "Magalu";
-        nomes[1] = "BIA";
-        nomes[2] = "Mudae";
-        nomes[3] = "Bahianinho.old";
-        nomes[4] = "SkyNet";
-        nomes[5] = "CB";
-        nomes[6] = "Pedro";
-        nomes[7] = "Garoto de Programa";
-        nomes[8] = "Craudo";
-        nomes[9] = "Megumin";
-        nomes[10] = "NatNatu";
-        
         initComponents();
+        nomes[1] = "Magalu";
+        nomes[2] = "BIA";
+        nomes[3] = "Mudae";
+        nomes[4] = "Bahianinho.old";
+        nomes[5] = "SkyNet";
+        nomes[6] = "CB";
+        nomes[7] = "Pedro";
+        nomes[8] = "Garoto de Programa";
+        nomes[9] = "Craudo";
+        nomes[10] = "Megumin";
+        nomes[11] = "NatNatu";
+        nomes[12] = "Google Assistent";
+        nomes[13] = "Siri";
+        nomes[14] = "Alexa";
+        nomes[15] = "Whatson";
+        qmJoga = true;
+        geraJogoPvp();
+        primeiroJogo = false;
+        botoes.setLayout(new GridLayout(tamTab, tamTab));
+        geraTab(tamTab);
+        if (pecaPC == "X" && contraPC) {
+            movimentoPC();
+        }
 
+    }
+
+    public void resetaJogo() {
+        resetaTab();
+        lblPonto1.setText("0");
+        lblPonto2.setText("0");
     }
 
     public void geraJogoPvp() {
-        lblJogador1.setText(pegaNome("Jogador1"));
-        lblJogador2.setText(pegaNome("Jogador2"));
+        if (!primeiroJogo) {
+            resetaJogo();
+        }
+        lblJogador1.setText(pegaNome("Jogador 1"));
+        lblJogador2.setText(pegaNome("Jogador 2"));
+        contraPC = false;
     }
 
     public void geraJogoPvm() {
+        resetaJogo();
         Random nomeM = new Random();
-        nomes[11] = pegaNome("Jogador1");
-        lblJogador1.setText(nomes[11]);
-        lblJogador2.setText(nomes[nomeM.nextInt(11)]);
+        nomes[0] = pegaNome("Jogador");
+        lblJogador1.setText(nomes[0]);
+        lblJogador2.setText(nomes[nomeM.nextInt(QTD_NOME_MAQUINA - 1)]);
+        contraPC = true;
     }
 
     public String pegaNome(String jogador) {
@@ -56,6 +92,50 @@ public class Principal extends javax.swing.JFrame {
             nomeJ = pegaNome(jogador);
         }
         return nomeJ;
+    }
+
+    public int geraModoDoente() {
+        String qtdDoente = JOptionPane.showInputDialog(this, "Digite o tamanho do tabuleiro(A partir de 3: 3 = 3x3, 4 = 4x4...)", "Tamanho tabuleiro", JOptionPane.INFORMATION_MESSAGE);
+        int qtdDoenca;
+        try {
+            qtdDoenca = Integer.parseInt(qtdDoente);
+            if (qtdDoenca < 3) {
+                qtdDoenca = geraModoDoente();
+            }
+        } catch (Exception e) {
+            qtdDoenca = geraModoDoente();
+        }
+        botoes.removeAll();
+        tamTab = qtdDoenca;
+        botoes.setLayout(new GridLayout(tamTab, tamTab));
+        return qtdDoenca;
+    }
+
+    public void geraTab(int tamTab) {
+        arrayJogo = null;
+        listaBotao = null;
+        arrayJogo = new String[tamTab * tamTab];
+        listaBotao = new JButton[tamTab * tamTab];
+        int valBtn = 0;
+        for (int i = 0; i < tamTab; i++) {
+            for (int j = 0; j < tamTab; j++) {
+                valBtn = tamTab * i + j;
+                listaBotao[valBtn] = new JButton();
+                listaBotao[valBtn].setFont(new Font("Arial", Font.PLAIN, 150 / tamTab));
+                listaBotao[valBtn].setPreferredSize(new Dimension(615 / tamTab, 615 / tamTab));
+                int finalI = i;
+                int finalJ = j;
+                int finalValBtn = valBtn;
+                listaBotao[valBtn].addActionListener(new ActionListener() {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        viraBotao(listaBotao[finalValBtn], finalValBtn);
+                    }
+                });
+                botoes.add(listaBotao[valBtn]).setLocation(i, j);
+            }
+        }
+        botoes.validate();
     }
 
     /**
@@ -71,16 +151,7 @@ public class Principal extends javax.swing.JFrame {
         lblJogador2 = new javax.swing.JLabel();
         lblPonto1 = new javax.swing.JLabel();
         lblPonto2 = new javax.swing.JLabel();
-        jPanel1 = new javax.swing.JPanel();
-        btnZeroZero = new javax.swing.JButton();
-        btnZeroUm = new javax.swing.JButton();
-        btnZeroDois = new javax.swing.JButton();
-        btnUmZero = new javax.swing.JButton();
-        btnUmUm = new javax.swing.JButton();
-        btnUmDois = new javax.swing.JButton();
-        btnDoisZero = new javax.swing.JButton();
-        btnDoisUm = new javax.swing.JButton();
-        btnDoisDois = new javax.swing.JButton();
+        botoes = new javax.swing.JPanel();
         lblAtaul = new javax.swing.JLabel();
         mnuBar = new javax.swing.JMenuBar();
         mnuJogo = new javax.swing.JMenu();
@@ -109,115 +180,15 @@ public class Principal extends javax.swing.JFrame {
         lblPonto2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblPonto2.setText("0");
 
-        btnZeroZero.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnZeroZero.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZeroZeroActionPerformed(evt);
-            }
-        });
-
-        btnZeroUm.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnZeroUm.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZeroUmActionPerformed(evt);
-            }
-        });
-
-        btnZeroDois.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnZeroDois.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnZeroDoisActionPerformed(evt);
-            }
-        });
-
-        btnUmZero.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnUmZero.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUmZeroActionPerformed(evt);
-            }
-        });
-
-        btnUmUm.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnUmUm.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUmUmActionPerformed(evt);
-            }
-        });
-
-        btnUmDois.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnUmDois.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnUmDoisActionPerformed(evt);
-            }
-        });
-
-        btnDoisZero.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnDoisZero.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDoisZeroActionPerformed(evt);
-            }
-        });
-
-        btnDoisUm.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnDoisUm.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDoisUmActionPerformed(evt);
-            }
-        });
-
-        btnDoisDois.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
-        btnDoisDois.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnDoisDoisActionPerformed(evt);
-            }
-        });
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnZeroZero, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnZeroUm, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnZeroDois, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnUmZero, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnUmUm, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnUmDois, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(btnDoisZero, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnDoisUm, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(btnDoisDois, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+        javax.swing.GroupLayout botoesLayout = new javax.swing.GroupLayout(botoes);
+        botoes.setLayout(botoesLayout);
+        botoesLayout.setHorizontalGroup(
+            botoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 615, Short.MAX_VALUE)
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnZeroZero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnZeroUm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnZeroDois, javax.swing.GroupLayout.DEFAULT_SIZE, 197, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnUmZero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnUmUm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnUmDois, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(btnDoisZero, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnDoisUm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(btnDoisDois, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        botoesLayout.setVerticalGroup(
+            botoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 615, Short.MAX_VALUE)
         );
 
         lblAtaul.setFont(new java.awt.Font("Fira Sans Semi-Light", 0, 25)); // NOI18N
@@ -243,6 +214,11 @@ public class Principal extends javax.swing.JFrame {
         mnuJogo.add(mnuPvm);
 
         mnuMdoente.setText("Modo Doente");
+        mnuMdoente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                mnuMdoenteActionPerformed(evt);
+            }
+        });
         mnuJogo.add(mnuMdoente);
 
         mnuBar.add(mnuJogo);
@@ -278,16 +254,16 @@ public class Principal extends javax.swing.JFrame {
                 .addComponent(lblJogador1, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(lblPonto1, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 90, Short.MAX_VALUE)
                 .addComponent(lblAtaul, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
                 .addComponent(lblPonto2, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(lblJogador2, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(botoes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -301,69 +277,32 @@ public class Principal extends javax.swing.JFrame {
                     .addComponent(lblPonto1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblJogador1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(lblAtaul, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 82, Short.MAX_VALUE)
+                .addComponent(botoes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void btnUmDoisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUmDoisActionPerformed
-        viraBotao(btnUmDois, 5);
-    }//GEN-LAST:event_btnUmDoisActionPerformed
-
-    private void btnZeroZeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZeroZeroActionPerformed
-        viraBotao(btnZeroZero, 0);
-    }//GEN-LAST:event_btnZeroZeroActionPerformed
-
-    private void btnZeroUmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZeroUmActionPerformed
-        viraBotao(btnZeroUm, 1);
-    }//GEN-LAST:event_btnZeroUmActionPerformed
-
-    private void btnZeroDoisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnZeroDoisActionPerformed
-        viraBotao(btnZeroDois, 2);
-    }//GEN-LAST:event_btnZeroDoisActionPerformed
-
-    private void btnUmZeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUmZeroActionPerformed
-        viraBotao(btnUmZero, 3);
-    }//GEN-LAST:event_btnUmZeroActionPerformed
-
-    private void btnUmUmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnUmUmActionPerformed
-        viraBotao(btnUmUm, 4);
-    }//GEN-LAST:event_btnUmUmActionPerformed
-
-    private void btnDoisZeroActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoisZeroActionPerformed
-        viraBotao(btnDoisZero, 6);
-    }//GEN-LAST:event_btnDoisZeroActionPerformed
-
-    private void btnDoisUmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoisUmActionPerformed
-        viraBotao(btnDoisUm, 7);
-    }//GEN-LAST:event_btnDoisUmActionPerformed
-
-    private void btnDoisDoisActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnDoisDoisActionPerformed
-        viraBotao(btnDoisDois, 8);
-    }//GEN-LAST:event_btnDoisDoisActionPerformed
-
     private void mnuSairActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSairActionPerformed
-        // TODO add your handling code here:
         this.dispose();
     }//GEN-LAST:event_mnuSairActionPerformed
 
     private void mnuSobreActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuSobreActionPerformed
-        // TODO add your handling code here:
         JOptionPane.showMessageDialog(this, "Este é um jogo da velha dinamico, que vai de tabuleiro 3x3 até o quanto o monitor e a RAM aguentar. \nFeito por Cristian Robert e Douglas Morona", "Sobre", JOptionPane.INFORMATION_MESSAGE);
     }//GEN-LAST:event_mnuSobreActionPerformed
 
     private void mnuPvpActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPvpActionPerformed
-        // TODO add your handling code here:
         geraJogoPvp();
     }//GEN-LAST:event_mnuPvpActionPerformed
 
     private void mnuPvmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuPvmActionPerformed
-        // TODO add your handling code here:
         geraJogoPvm();
-
     }//GEN-LAST:event_mnuPvmActionPerformed
+
+    private void mnuMdoenteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_mnuMdoenteActionPerformed
+        geraTab(geraModoDoente());
+    }//GEN-LAST:event_mnuMdoenteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -376,7 +315,7 @@ public class Principal extends javax.swing.JFrame {
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
+                if ("GTK+".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
                 }
@@ -401,31 +340,69 @@ public class Principal extends javax.swing.JFrame {
     }
 
     public void viraBotao(JButton botao, int valorBotao) {
+        String valorJogador = "";
         if (botao.getText() == "" && botao.getText() != "X" && botao.getText() != "O") {
-            String valorJogador;
+            valorJogador = lblAtaul.getText();
             if (qmJoga) {
-                valorJogador = "X";
                 lblAtaul.setText("O");
+                lblJogador1.setFont(new Font("", Font.PLAIN, 18));
+                lblJogador2.setFont(new Font("", Font.BOLD, 18));
             } else {
-                valorJogador = "O";
                 lblAtaul.setText("X");
+                lblJogador1.setFont(new Font("", Font.BOLD, 18));
+                lblJogador2.setFont(new Font("", Font.PLAIN, 18));
             }
+            qmJoga = !qmJoga;
             botao.setText(valorJogador);
             arrayJogo[valorBotao] = valorJogador;
             if (verificaVitoria(valorJogador)) {
                 String jogador;
                 if (valorJogador == "X") {
                     jogador = lblJogador1.getText();
+                    lblPonto1.setText("" + (Integer.parseInt(lblPonto1.getText()) + 1));
                 } else {
                     jogador = lblJogador2.getText();
+                    lblPonto2.setText("" + (Integer.parseInt(lblPonto2.getText()) + 1));
                 }
-                JOptionPane.showMessageDialog(this, "Parabéns, o jogador " + jogador + " venceu o jogo", "VENCEDOR", JOptionPane.INFORMATION_MESSAGE);
+                Object[] options = {"Sim", "Não"};
+                if (JOptionPane.showOptionDialog(this, "Parabéns, o jogador " + jogador + " venceu o jogo, deseja jogar novamente", "VENCEDOR", JOptionPane.DEFAULT_OPTION, JOptionPane.INFORMATION_MESSAGE, null, options, options[0]) == JOptionPane.OK_OPTION) {
+                    resetaTab();
+                } else {
+                    this.dispose();
+                }
             }
-            qmJoga = !qmJoga;
+            Object[] options = {"Sim", "Não"};
+            if (verificaVelha()) {
+                if (JOptionPane.showOptionDialog(this, "Putz, deu velha, vamos jogar de novo?", "VELHA", JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, options, options[0]) == JOptionPane.OK_OPTION) {
+                    resetaTab();
+                } else {
+                    this.dispose();
+                }
+            }
+            if (contraPC && valorJogador != pecaPC) {
+                movimentoPC();
+            }
         }
-        if (verificaVelha()) {
-            JOptionPane.showMessageDialog(this, "Putz, deu velha, vamos jogar de novo", "VELHA", JOptionPane.WARNING_MESSAGE);
+    }
+
+    public void resetaTab() {
+        for (int i = 0; i < tamTab * tamTab; i++) {
+            arrayJogo[i] = "";
+            listaBotao[i].setText("");
         }
+        qmJoga = true;
+        lblAtaul.setText("X");
+    }
+
+    public void movimentoPC() {
+        Random botaoPC = new Random();
+        int valorPC = botaoPC.nextInt(tamTab * tamTab - 1);
+        if (arrayJogo[valorPC] != "X" && arrayJogo[valorPC] != "O") {
+            viraBotao(listaBotao[valorPC], valorPC);
+        } else {
+            movimentoPC();
+        }
+
     }
 
     public boolean verificaVelha() {
@@ -444,7 +421,7 @@ public class Principal extends javax.swing.JFrame {
             }
         }
         for (int i = 0; i < tamTab; i++) {
-            if (verificaVertical(valorJogador, tamTab + i)) {
+            if (verificaVertical(valorJogador, i)) {
                 return true;
             }
         }
@@ -485,7 +462,7 @@ public class Principal extends javax.swing.JFrame {
     }
 
     public boolean verificaDiagonal2(String valorJogador) {
-        for (int i = 0; i < Math.pow(tamTab, 2); i += tamTab - 1) {
+        for (int i = tamTab - 1; i < Math.pow(tamTab, 2) - (tamTab - 1); i += tamTab - 1) {
             if (arrayJogo[i] != valorJogador) {
                 return false;
             }
@@ -494,16 +471,7 @@ public class Principal extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton btnDoisDois;
-    private javax.swing.JButton btnDoisUm;
-    private javax.swing.JButton btnDoisZero;
-    private javax.swing.JButton btnUmDois;
-    private javax.swing.JButton btnUmUm;
-    private javax.swing.JButton btnUmZero;
-    private javax.swing.JButton btnZeroDois;
-    private javax.swing.JButton btnZeroUm;
-    private javax.swing.JButton btnZeroZero;
-    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel botoes;
     private javax.swing.JLabel lblAtaul;
     private javax.swing.JLabel lblJogador1;
     private javax.swing.JLabel lblJogador2;
